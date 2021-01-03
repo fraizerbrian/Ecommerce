@@ -81,10 +81,19 @@
 
 <script type="text/javascript">
   var shipping = '{{order.shipping}}'
+  var total = '{{order.get_cart_total|floatformat:2}}'
 
   if (shipping == 'False') {
     document.getElementById('shipping-info').InnerHTML = ''
   }
+
+  if (shipping == 'False' && user != 'AnonymousUser'){
+    // hide form if user is logged in and shipping is false
+    document.getElementById('form-wrapper').classList.add("hidden");
+    // show payment if logged in user wants to buy an item that doesnt require shipping
+    document.getElementsById('payment-info').classList.remove("hidden");
+  }
+
 
   var form = document.getElementById('form')
   form.addEventListener('submit', function(e){
@@ -96,8 +105,32 @@
   document.getElementById('make-payment').addEventListener('click',function(e){
     submitFormData()
   })
+
   function submitFormData(){
     console.Log('Payment button clicked')
+
+    var userFormData = {
+      'name':null,
+      'email':null,
+      'total':total,
+    }
+    var ShippingInfo = {
+      'address':null,
+      'city':null,
+      'state':null,
+      'zipcode':null,
+    }
+    if(shipping != 'False'){
+      shippingInfo.address = form.address.value
+      shippingInfo.city = form.city.value
+      shippingInfo.state = form.state.value
+      shippingInfo.zipcode = form.zipcode.value
+    }
+
+    if(user == 'AnonymousUser'){
+      userFormData.name = form.address.value
+      userFormData.city = form.city.value
+    }
   }
 </script>
 {% endblock content %}
